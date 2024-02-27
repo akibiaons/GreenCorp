@@ -7,5 +7,13 @@ export default {
     },
     extend: {},
   },
+  options: {
+    safelist: [
+      "swiper-slide-active",
+      "swiper-slide-next",
+      "swiper-slide-prev",
+      // any other dynamic classes you are using
+    ],
+  },
   plugins: [],
 };

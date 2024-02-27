@@ -2,6 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+// Swiper carousel for products section
+import { Swiper, SwiperSlide } from "swiper/react"; // Import Swiper components
+import "swiper/css"; // Import Swiper styles
+
+// Import fetch products API
+import fetchProducts from "../api/api"; // Ensure correct import path
+
 // Icon imports:
 import { GiWorld, GiCheckboxTree } from "react-icons/gi";
 import { GrUserWorker } from "react-icons/gr";
@@ -27,10 +34,14 @@ export default function Home() {
   // Navigate below
   const navigate = useNavigate();
   // Below is state for the about us / services card section
-  const [activeItem, setActiveItem] = useState("HDPE");
+  const [activeItem, setActiveItem] = useState("LDPE");
   const [showTitle, setShowTitle] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
   const [hoveredCard, setHoveredCard] = useState(1);
+
+  // Fetch products hooks and state
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,69 +51,51 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  const products = [
-    // HDPE Below
-    {
-      img: "https://polyfit.us/img/polyfit/HDPE_PCR_BLOW_MOLD_REPRO.png",
-      title: "PCR BLOW MOLD REPRO",
-      description: "HDPE",
-    },
-    // LDPE Below
-    {
-      img: "https://polyfit.us/img/polyfit/LDPE_CLEAR_PCR_REPRO.png",
-      title: "CLEAR PCR REPRO",
-      description: "LDPE",
-    },
-    // LLDPE
-    {
-      img: "https://polyfit.us/img/polyfit/LLDPE_CLEAR_PCR_REPRO.png",
-      title: "CLEAR PCR REPRO",
-      description: "LLDPE",
-    },
-    // PP
-    {
-      img: "https://polyfit.us/img/polyfit/PP_REPRO.png",
-      title: "PP REPRO",
-      description: "PP",
-    },
-    // PS
-    {
-      img: "https://polyfit.us/img/polyfit/PS_REPRO.png",
-      title: "PS REPRO",
-      description: "PS",
-    },
-  ];
 
-  // Service images
-  const serviceImages = [
-    {
-      img: "src/assets/KnjStockImg/1.png",
-      id: 1,
-    },
-    {
-      img: "src/assets/KnjStockImg/2.png",
-      id: 2,
-    },
-    {
-      img: "src/assets/KnjStockImg/3.png",
-      id: 3,
-    },
-  ];
+  // useEffect, hook for calling and formatting the imported product data.
+  useEffect(() => {
+    const getProducts = async () => {
+      const result = await fetchProducts();
+      if (result.data && !result.error) {
+        const formattedProducts = result.data.map((item) => {
+          const { id, attributes } = item;
+          const { product_title, product_desc, product_Img } = attributes;
 
+          const imageUrl =
+            product_Img.data.length > 0
+              ? product_Img.data[0].attributes.url
+              : "";
+
+          return {
+            id,
+            title: product_title,
+            desc: product_desc,
+            img: imageUrl,
+          };
+        });
+        setProducts(formattedProducts);
+      } else {
+        setError(result.error || "An unkown error occured!");
+      }
+    };
+    getProducts();
+  }, []);
+
+  // Below is array that shows in section support...
   const sections = [
     {
-      title: "45,000 Pounds",
-      description: "Of monthly storage volume of roving fabric in warehouse",
+      title: "45,000 Lorem",
+      description: "Lorem ipsum dipsum alipsum elrit ",
     },
     {
-      title: "Shipping same day guaranteed!",
+      title: "Lorem ipsum dolor sit!",
       description:
-        "Upon conclusion of an agreement and 100% prepayment - the minimum period for issuing an order is from 1 day",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
     },
     {
-      title: "We work with VAT",
+      title: "Lorem ipsum dolor",
       description:
-        "Quality guarantee under the contract. Conclusion of contracts for tender procurement Federal Law-44 and Federal Law-223",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
   ];
 
@@ -114,40 +107,63 @@ export default function Home() {
     setCurrentSection((currentSection - 1 + sections.length) % sections.length);
   };
 
+  // Below are the items that render the content in the products "accordian"
   const renderItemContent = () => {
     switch (activeItem) {
       /* HDPE Listings */
-      case "HDPE":
-        return (
-          <div className="flex flex-col md:flex-row justify-start">
-            <div className="flex flex-row justify-center gap-2 items-center">
-              <div className="text-2xl text-white bg-[#59c9a5] rounded-full p-2 pr-3">
-                <FaArrowRightToBracket />
-              </div>
-              <p className="text-2xl  font-medium tracking-wide lowercase">
-                ISO PFR
-              </p>
-            </div>
-            <img
-              className="max-w-full h-64"
-              src="src/assets/placeholderItem.png"
-            />
-          </div>
-        );
+      // case "HDPE":
+      //   return (
+      //     <div className="flex flex-col md:flex-row justify-start">
+      //       <div className="flex flex-row justify-center gap-2 items-center">
+      //         {/* <div className="text-2xl text-white bg-[#59c9a5] rounded-full p-2 pr-3">
+      //           {/* <FaArrowRightToBracket />
+      //         </div> */}
+      //         <p className="text-2xl  font-medium tracking-wide lowercase">
+      //           Coming soon...
+      //         </p>
+      //       </div>
+      //       <img
+      //         className="max-w-full h-64"
+      //         src="src/assets/placeholderItem.png"
+      //       />
+      //     </div>
+      //   );
       /* LDPE Product Listings */
       case "LDPE":
         return (
           <div className="flex flex-col md:flex-row">
             <div className="flex flex-col gap-8">
-              <div className="flex flex-row justify-center gap-2 items-center">
-                <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+              <div className="flex flex-col justify-center gap-2 items-center">
+                {/* <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
                   <FaArrowRightToBracket />
-                </div>
+                </div> */}
                 <p className="text-2xl  font-medium tracking-wide lowercase">
-                  ISO PFR
+                  Products
                 </p>
+                <Swiper
+                  // Swiper parameters such as slidesPerView, loop, etc.
+                  spaceBetween={50}
+                  slidesPerView={1}
+                  onSlideChange={() => console.log("slide change")}
+                  onSwiper={(swiper) => console.log(swiper)}
+                >
+                  {products &&
+                    products.map((product) => (
+                      <div key={product.id} className="">
+                        <img
+                          src={product.img}
+                          alt={product.title}
+                          onError={(e) => (e.target.src = "an error occurred.")}
+                          className="w-[50%] mx-auto h-auto object-cover rounded"
+                        />
+                        {/* <h2 className="text-xl font-bold mt-2">{product.title}</h2>
+                    <p className="text-gray-600">{product.desc}</p> */}
+                        {/* Add more product details here */}
+                      </div>
+                    ))}
+                </Swiper>
               </div>
-              <div className="flex flex-row justify-center gap-2 items-center">
+              {/* <div className="flex flex-row justify-center gap-2 items-center">
                 <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
                   <FaArrowRightToBracket />
                 </div>
@@ -162,105 +178,101 @@ export default function Home() {
                 <p className="text-2xl  font-medium tracking-wide lowercase">
                   ECO FR
                 </p>
-              </div>
+              </div> */}
             </div>
-            <img
-              className="max-w-full h-64"
-              src="src/assets/placeholderItem.png"
-            />
           </div>
         );
       /* LLDPE Product Listings */
-      case "LLDPE":
-        return (
-          <div className="flex flex-col md:flex-row">
-            <div className="text-2xl pt-8 font-medium tracking-wide lowercase flex flex-col">
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-row justify-center gap-2 items-center">
-                  <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
-                    <FaArrowRightToBracket />
-                  </div>
-                  <p className="text-2xl  font-medium tracking-wide lowercase">
-                    ISO PFR
-                  </p>
-                </div>
-                <div className="flex flex-row justify-center gap-2 items-center">
-                  <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
-                    <FaArrowRightToBracket />
-                  </div>
-                  <p className="text-2xl  font-medium tracking-wide lowercase">
-                    FD PFR
-                  </p>
-                </div>
-                <div className="flex flex-row  justify-center gap-2 items-center">
-                  <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
-                    <FaArrowRightToBracket />
-                  </div>
-                  <p className="text-2xl  font-medium tracking-wide lowercase">
-                    ECO FR
-                  </p>
-                </div>
-                <div className="flex flex-row  justify-center gap-2 items-center">
-                  <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
-                    <FaArrowRightToBracket />
-                  </div>
-                  <p className="text-2xl  font-medium tracking-wide lowercase">
-                    FRFR MUN
-                  </p>
-                </div>
-                <div className="flex flex-row  justify-center gap-2 items-center">
-                  <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
-                    <FaArrowRightToBracket />
-                  </div>
-                  <p className="text-2xl  font-medium tracking-wide lowercase">
-                    ECOECO
-                  </p>
-                </div>
-              </div>
-            </div>
-            <img
-              className="max-w-full h-64"
-              src="src/assets/placeholderItem.png"
-            />
-          </div>
-        );
+      // case "LLDPE":
+      //   return (
+      //     <div className="flex flex-col md:flex-row">
+      //       <div className="text-2xl pt-8 font-medium tracking-wide lowercase flex flex-col">
+      //         <div className="flex flex-col gap-8">
+      //           <div className="flex flex-row justify-center gap-2 items-center">
+      //             <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+      //               <FaArrowRightToBracket />
+      //             </div>
+      //             <p className="text-2xl  font-medium tracking-wide lowercase">
+      //               ISO PFR
+      //             </p>
+      //           </div>
+      //           <div className="flex flex-row justify-center gap-2 items-center">
+      //             <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+      //               <FaArrowRightToBracket />
+      //             </div>
+      //             <p className="text-2xl  font-medium tracking-wide lowercase">
+      //               FD PFR
+      //             </p>
+      //           </div>
+      //           <div className="flex flex-row  justify-center gap-2 items-center">
+      //             <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+      //               <FaArrowRightToBracket />
+      //             </div>
+      //             <p className="text-2xl  font-medium tracking-wide lowercase">
+      //               ECO FR
+      //             </p>
+      //           </div>
+      //           <div className="flex flex-row  justify-center gap-2 items-center">
+      //             <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+      //               <FaArrowRightToBracket />
+      //             </div>
+      //             <p className="text-2xl  font-medium tracking-wide lowercase">
+      //               FRFR MUN
+      //             </p>
+      //           </div>
+      //           <div className="flex flex-row  justify-center gap-2 items-center">
+      //             <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+      //               <FaArrowRightToBracket />
+      //             </div>
+      //             <p className="text-2xl  font-medium tracking-wide lowercase">
+      //               ECOECO
+      //             </p>
+      //           </div>
+      //         </div>
+      //       </div>
+      //       <img
+      //         className="max-w-full h-64"
+      //         src="src/assets/placeholderItem.png"
+      //       />
+      //     </div>
+      //   );
       /* PP Product Listings */
-      case "PP":
-        return (
-          <div className="flex flex-col md:flex-row justify-start">
-            <div className="flex flex-row justify-center gap-2 items-center">
-              <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
-                <FaArrowRightToBracket />
-              </div>
-              <p className="text-2xl  font-medium tracking-wide lowercase">
-                ISO PFR
-              </p>
-            </div>
-            <img
-              className="max-w-full h-64"
-              src="src/assets/placeholderItem.png"
-            />
-          </div>
-        );
+      // case "PP":
+      //   return (
+      //     <div className="flex flex-col md:flex-row justify-start">
+      //       <div className="flex flex-row justify-center gap-2 items-center">
+      //         <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+      //           <FaArrowRightToBracket />
+      //         </div>
+      //         <p className="text-2xl  font-medium tracking-wide lowercase">
+      //           ISO PFR
+      //         </p>
+      //       </div>
+      //       <img
+      //         className="max-w-full h-64"
+      //         src="src/assets/placeholderItem.png"
+      //       />
+      //     </div>
+      //   );
 
       /* PS Product Listings */
-      case "PS":
-        return (
-          <div className="flex flex-col md:flex-row justify-start">
-            <div className="flex flex-row justify-center gap-2 items-center">
-              <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
-                <FaArrowRightToBracket />
-              </div>
-              <p className="text-2xl  font-medium tracking-wide lowercase">
-                ISO PFR
-              </p>
-            </div>
-            <img
-              className="max-w-full h-64"
-              src="src/assets/placeholderItem.png"
-            />
-          </div>
-        );
+      // case "PS":
+      //   return (
+      //     <div className="flex flex-col md:flex-row justify-start">
+      //       <div className="flex flex-row justify-center gap-2 items-center">
+      //         <div className="text-2xl text-white bg-[#59c9a5]  rounded-full p-2 pr-3">
+      //           <FaArrowRightToBracket />
+      //         </div>
+      //         <p className="text-2xl  font-medium tracking-wide lowercase">
+      //           ISO PFR
+      //         </p>
+      //       </div>
+      //       <img
+      //         className="max-w-full h-64"
+      //         src="src/assets/placeholderItem.png"
+      //       />
+      //     </div>
+      //   );
     }
   };
 
@@ -344,13 +356,13 @@ export default function Home() {
               Spotlight
             </h2>
           </div>
-          <div class="flex justify-center items-center mb-3">
+          {/* <div class="flex justify-center items-center mb-3">
             <div class="border-t border-gray-300 w-16"></div>
             <span class="px-2 text-gray-400 text-xl">
               <TiWorld />
             </span>
             <div class="border-t border-gray-300 w-16"></div>
-          </div>
+          </div> */}
 
           <div className="flex flex-col md:flex-row items-start gap-6 line-clamp-3 justify-center w-full md:gap-10 px-2 md:px-4 mx-auto  max-w-5xl">
             <div className="flex flex-col justify-center w-full text-center ">
@@ -360,27 +372,27 @@ export default function Home() {
               <h3 className="text-2xl font-semibold tracking-tighter">
                 Recycling
               </h3>
-              <p className="tracking-wide font-light text-gray-500">
+              <p className="tracking-wide font-light text-gray-950">
                 We pride ourselves in the hassle-free and cost effective
                 recycling process for associates
               </p>
-              <p className="tracking-wider font-normal hover:text-gray-500">
+              {/* <p className="tracking-wider font-normal hover:text-gray-500">
                 Learn more {">"}
                 {">"}
-              </p>
+              </p> */}
             </div>
             <div className="flex flex-col   w-full justify-center text-center ">
               <div className=" bg-green-300  mx-auto rounded-full text-white text-3xl flex p-4 justify-center items-center">
                 <FaPeopleArrows />
               </div>
               <h3 className="text-2xl font-semibold tracking-tighter">B2B</h3>
-              <p className="tracking-wide font-light text-gray-500">
+              <p className="tracking-wide font-light text-gray-950">
                 Business to Business transactions are our specialty
               </p>
-              <p className="tracking-wider font-normal hover:text-gray-500">
+              {/* <p className="tracking-wider font-normal hover:text-gray-950">
                 Learn more {">"}
                 {">"}
-              </p>
+              </p> */}
             </div>
             <div className="flex flex-col  w-full justify-center text-center ">
               <div className=" bg-green-300  mx-auto rounded-full text-white text-3xl flex p-4 justify-center items-center">
@@ -389,14 +401,14 @@ export default function Home() {
               <h3 className="text-2xl font-semibold tracking-tighter">
                 Shipping
               </h3>
-              <p className="tracking-wide font-light text-gray-500">
+              <p className="tracking-wide font-light text-gray-950">
                 No matter what continent you require material, we will get it
                 shipped to you.
               </p>
-              <p className="tracking-wider font-normal hover:text-gray-500">
+              {/* <p className="tracking-wider font-normal hover:text-gray-950">
                 Learn more {">"}
                 {">"}
-              </p>
+              </p> */}
             </div>
             <div className="flex flex-col  w-full justify-center text-center ">
               <div className=" bg-green-300  mx-auto rounded-full text-white text-3xl flex p-4 justify-center items-center">
@@ -405,14 +417,14 @@ export default function Home() {
               <h3 className="text-2xl font-semibold tracking-tighter">
                 Environment
               </h3>
-              <p className="tracking-wide font-light text-gray-500">
+              <p className="tracking-wide font-light text-gray-950">
                 Processing of materials is done by hand, by real people.
                 Ensuring high-grade quality.
               </p>
-              <p className="tracking-wider font-normal hover:text-gray-500">
+              {/* <p className="tracking-wider font-normal hover:text-gray-950">
                 Learn more {">"}
                 {">"}
-              </p>
+              </p> */}
             </div>
             <div className="flex flex-col  w-full justify-center text-center ">
               <div className=" bg-green-300  mx-auto rounded-full text-white text-3xl flex p-4 justify-center items-center">
@@ -421,14 +433,14 @@ export default function Home() {
               <h3 className="text-2xl font-semibold tracking-tighter">
                 Distribution
               </h3>
-              <p className="tracking-wide font-light text-gray-500">
+              <p className="tracking-wide font-light text-gray-950">
                 Tackling distribution, ensuring quality and proper delivery, we
                 make handling product a stress-free operation.
               </p>
-              <p className="tracking-wider font-normal hover:text-gray-500">
+              {/* <p className="tracking-wider font-normal hover:text-gray-500">
                 Learn more {">"}
                 {">"}
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
@@ -475,58 +487,32 @@ export default function Home() {
               id="container__left"
               className="flex flex-col space-y-8 md:w-fit justify-start px-4 md:px-0 mb-8"
             >
-              {["HDPE", "LDPE", "LLDPE", "PP", "PS"].map((item) => (
-                <div
-                  key={item}
-                  onClick={() => setActiveItem(item)}
-                  className={`flex items-center cursor-pointer w-full ${
-                    activeItem === item ? "slide-text" : "text-gray-400"
-                  }`}
-                >
-                  {activeItem === item && (
-                    <IoMdArrowDropright className="mr-2 arrow-spin" />
-                  )}
-                  <h3
-                    className={`text-5xl tracking-tighter font-semibold hover:underline decoration-[#baf2bb] overflow-hidden decoration-4 ${
-                      activeItem === item ? "" : "hover:text-animation"
+              {["", "LDPE", "", "", ""].map(
+                (
+                  item // "" will go HDPE, LLDPE, PP, and PS respectively
+                ) => (
+                  <div
+                    key={item}
+                    onClick={() => setActiveItem(item)}
+                    className={`flex items-center cursor-pointer w-full ${
+                      activeItem === item ? "slide-text" : "text-gray-400"
                     }`}
                   >
-                    {item}
-                  </h3>
-                </div>
-              ))}
+                    {activeItem === item && (
+                      <IoMdArrowDropright className="mr-2 arrow-spin" />
+                    )}
+                    <h3
+                      className={`text-5xl tracking-tighter font-semibold hover:underline decoration-[#baf2bb] overflow-hidden decoration-4 ${
+                        activeItem === item ? "" : "hover:text-animation"
+                      }`}
+                    >
+                      {item}
+                    </h3>
+                  </div>
+                )
+              )}
             </div>
             <div id="container__right">{renderItemContent()}</div>
-          </div>
-        </div>
-
-        {/* Middle Support  */}
-        <div className="w-full">
-          <div className="flex flex-col sm:flex-row md:grid md:grid-cols-8 md:grid-rows-1">
-            <img
-              className="object-cover w-full col-start-1 col-end-4  h-[500px]"
-              src="https://kmsibir.ru/upload/iblock/572/lyz6j3z00d7d8jomqhpu4s452m9t1sah.jpg"
-              alt=""
-            />
-
-            <div className=" bg-[#59c9a5]  text-white pt-12 pb-24 px-10  flex flex-col justify-between col-start-4 col-end-9 row-span-1">
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight mb-1">
-                  {sections[currentSection].title}
-                </h2>
-                <p className="text-lg font-light tracking-wide">
-                  {sections[currentSection].description}
-                </p>
-              </div>
-              <div className="flex justify-around mt-4">
-                <p className="cursor-pointer text-5xl" onClick={prevSection}>
-                  <FaArrowAltCircleLeft />
-                </p>
-                <p className="cursor-pointer text-5xl" onClick={nextSection}>
-                  <FaArrowAltCircleRight />
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -606,4 +592,41 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+// Commented out code:
+// -- Took out the duplicate support to avoid repetitiveness
+
+{
+  /* Middle Support  */
+}
+{
+  /* <div className="w-full">
+          <div className="flex flex-col sm:flex-row md:grid md:grid-cols-8 md:grid-rows-1">
+            <img
+              className="object-cover w-full col-start-1 col-end-4  h-[500px]"
+              src="https://kmsibir.ru/upload/iblock/572/lyz6j3z00d7d8jomqhpu4s452m9t1sah.jpg"
+              alt=""
+            />
+
+            <div className=" bg-[#59c9a5]  text-white pt-12 pb-24 px-10  flex flex-col justify-between col-start-4 col-end-9 row-span-1">
+              {/* <div>
+                <h2 className="text-3xl font-bold tracking-tight mb-1">
+                  {sections[currentSection].title}
+                </h2>
+                <p className="text-lg font-light tracking-wide">
+                  {sections[currentSection].description}
+                </p>
+              </div>
+              {/* <div className="flex justify-around mt-4">
+                <p className="cursor-pointer text-5xl" onClick={prevSection}>
+                  <FaArrowAltCircleLeft />
+                </p>
+                <p className="cursor-pointer text-5xl" onClick={nextSection}>
+                  <FaArrowAltCircleRight />
+                </p>
+              </div>
+            </div>
+          </div>
+        </div> */
 }

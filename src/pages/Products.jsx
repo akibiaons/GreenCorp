@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import fetchProducts from "../api/api"; // Ensure correct import path
 import { Swiper, SwiperSlide } from "swiper/react"; // Import Swiper components
 import "swiper/css"; // Import Swiper styles
+import "../index.css";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -41,24 +42,33 @@ export default function Products() {
   return (
     <div>
       {/* Mobile Carousel */}
-      <div className="lg:hidden block">
-        <Swiper
-          // Swiper parameters such as slidesPerView, loop, etc.
-          spaceBetween={50}
-          slidesPerView={1}
-          onSlideChange={() => console.log("slide change")}
-          onSwiper={(swiper) => console.log(swiper)}
-        >
-          {products &&
-            products.map((product) => (
-              <SwiperSlide key={product.id} className="product-card">
-                {/* Render your product details here */}
-                <img src={product.img} alt={product.title} />
-                <h2>{product.title}</h2>
-                <p>{product.desc}</p>
+      <div className="lg:hidden block mt-28">
+        <div className="container mx-auto">
+          <Swiper
+            // Swiper parameters
+            spaceBetween={16} // Adjust as needed
+            slidesPerView={1.4}
+            centeredSlides={true}
+            className="overflow-hidden"
+            onSlideChange={() => console.log("slide change")}
+            onSwiper={(swiper) => console.log(swiper)}
+          >
+            {products.map((product) => (
+              <SwiperSlide
+                key={product.id}
+                className="product-card flex flex-col items-center"
+              >
+                <img
+                  src={product.img}
+                  alt={product.title}
+                  className="w-full h-auto"
+                />
+                <h2 className="text-lg font-bold mt-2">{product.title}</h2>
+                <p className="text-sm text-gray-500">{product.desc}</p>
               </SwiperSlide>
             ))}
-        </Swiper>
+          </Swiper>
+        </div>
       </div>
 
       {/* Desktop Grid */}
