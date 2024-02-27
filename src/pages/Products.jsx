@@ -41,12 +41,12 @@ export default function Products() {
 
   return (
     <div>
-      {/* Mobile Carousel */}
-      <div className="lg:hidden block mt-28">
+      {/*  Mobile Carousel  */}
+      <div className="lg:hidden block mt-32 mb-28">
         <div className="container mx-auto">
           <Swiper
-            // Swiper parameters
-            spaceBetween={16} // Adjust as needed
+            //Swiper parameters
+            spaceBetween={16} //Adjust as needed
             slidesPerView={1.4}
             centeredSlides={true}
             className="overflow-hidden"
@@ -56,7 +56,7 @@ export default function Products() {
             {products.map((product) => (
               <SwiperSlide
                 key={product.id}
-                className="product-card flex flex-col items-center"
+                className="product-card flex flex-col items-center p-2"
               >
                 <img
                   src={product.img}
